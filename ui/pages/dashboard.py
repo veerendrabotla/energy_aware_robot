@@ -1,14 +1,14 @@
-import streamlit as st
-import sys
-import os
+import streamlit as st # type: ignore
+import sys # type: ignore
+import os # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from model.train_ann import load_model
+from model.train_ann import load_model # type: ignore
 
 st.set_page_config(page_title="Dashboard", layout="wide")
 
 # Init checks
-from ui.session_manager import init_session
+from ui.session_manager import init_session # type: ignore
 init_session()
 
 st.title("🏠 Advanced Dashboard")

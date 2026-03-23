@@ -1,9 +1,9 @@
-import streamlit as st
-import sys
-import os
+import streamlit as st # type: ignore
+import sys # type: ignore
+import os # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from model.train_ann import load_model
+from model.train_ann import load_model # type: ignore
 
 def init_session():
     # Unified Global Phase State (Defaults to Phase 2: 3D Slopes)

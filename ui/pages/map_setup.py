@@ -1,16 +1,16 @@
-import streamlit as st
-import sys
-import os
+import streamlit as st # type: ignore
+import sys # type: ignore
+import os # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from environment.map_generator import generate_2d_map, get_valid_start_goal
-from environment.terrain_generator import generate_3d_terrain
-from plots.plot_2d import plot_2d_grid
-from plots.plot_3d import plot_3d_terrain
+from environment.map_generator import generate_2d_map, get_valid_start_goal # type: ignore
+from environment.terrain_generator import generate_3d_terrain # type: ignore
+from plots.plot_2d import plot_2d_grid # type: ignore
+from plots.plot_3d import plot_3d_terrain # type: ignore
 
 st.set_page_config(page_title="Map Setup", layout="wide")
 
-from ui.session_manager import init_session
+from ui.session_manager import init_session # type: ignore
 init_session()
 
 st.title("🗺️ Map & Terrain Setup")

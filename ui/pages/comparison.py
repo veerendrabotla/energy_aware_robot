@@ -1,15 +1,15 @@
-import streamlit as st
-import sys
-import os
-import pandas as pd
+import streamlit as st # type: ignore
+import sys # type: ignore
+import os # type: ignore
+import pandas as pd # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from evaluation.metrics import compute_metrics
+from evaluation.metrics import compute_metrics # type: ignore
 
 st.set_page_config(page_title="Comparison", layout="wide")
 st.title("⚖️ Heuristic vs AI Head-to-Head")
 
-from ui.session_manager import init_session
+from ui.session_manager import init_session # type: ignore
 init_session()
 
 if st.session_state.get("astar_path") or st.session_state.get("ann_path"):

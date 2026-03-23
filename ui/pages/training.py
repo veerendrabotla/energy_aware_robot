@@ -1,12 +1,13 @@
-import streamlit as st
+import streamlit as st # type: ignore
 import sys
 import os
-import pandas as pd
+import pandas as pd # type: ignore
+import numpy as np # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from dataset.dataset_generator import generate_dataset
-from model.train_ann import train_and_save_model
-from ui.session_manager import init_session
+from dataset.dataset_generator import generate_dataset # type: ignore
+from model.train_ann import train_and_save_model # type: ignore
+from ui.session_manager import init_session # type: ignore
 init_session()
 
 st.set_page_config(page_title="Model Training", layout="wide")
@@ -22,7 +23,7 @@ with colA:
     st.radio("Feature Set Phase", [1, 2], key="global_phase")
     phase_sel = st.session_state.global_phase
     
-    if st.button("Build Dataset", width="stretch"):0 
+    if st.button("Build Dataset", width="stretch"):
         with st.spinner("Extracting features and labeling..."):
             X, y, path = generate_dataset(phase=phase_sel, num_maps=maps_to_gen, scenarios_per_map=scenarios)
             st.session_state.temp_X = X
@@ -44,9 +45,9 @@ with colA:
 with colB:
     if "temp_y" in st.session_state:
         st.markdown("### Internal Class Distribution")
-        fwd = (st.session_state.temp_y == 0).sum()
-        lft = (st.session_state.temp_y == 1).sum()
-        rgt = (st.session_state.temp_y == 2).sum()
+        fwd = int(np.sum(np.array(st.session_state.temp_y) == 0))
+        lft = int(np.sum(np.array(st.session_state.temp_y) == 1))
+        rgt = int(np.sum(np.array(st.session_state.temp_y) == 2))
         df_dist = pd.DataFrame({"Actions": ["Forward", "Left", "Right"], "Samples": [fwd, lft, rgt]})
         st.bar_chart(df_dist.set_index("Actions"), color="#ffaa00")
         

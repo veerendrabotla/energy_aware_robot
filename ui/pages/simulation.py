@@ -1,15 +1,15 @@
-import streamlit as st
-import sys
-import os
-import numpy as np
+import streamlit as st # type: ignore
+import sys # type: ignore
+import os # type: ignore
+import numpy as np # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from planning.astar import astar_path
-from navigation.run_navigation import run_ann_navigation
-from dataset.dataset_generator import extract_features
-from plots.plot_2d import plot_2d_grid
-from plots.plot_3d import plot_3d_terrain
-from ui.session_manager import init_session
+from planning.astar import astar_path # type: ignore
+from navigation.run_navigation import run_ann_navigation # type: ignore
+from dataset.dataset_generator import extract_features # type: ignore
+from plots.plot_2d import plot_2d_grid # type: ignore
+from plots.plot_3d import plot_3d_terrain # type: ignore
+from ui.session_manager import init_session # type: ignore
 init_session()
 
 st.set_page_config(page_title="Simulation", layout="wide")

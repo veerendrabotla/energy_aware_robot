@@ -1,24 +1,24 @@
-import streamlit as st
-import sys
-import os
-import time
-import pandas as pd
+import streamlit as st # type: ignore
+import sys # type: ignore
+import os # type: ignore
+import time # type: ignore
+import pandas as pd # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from environment.map_generator import generate_2d_map, get_valid_start_goal
-from environment.terrain_generator import generate_3d_terrain
-from planning.astar import astar_path
-from dataset.dataset_generator import generate_dataset
-from model.train_ann import train_and_save_model, load_model
-from navigation.run_navigation import run_ann_navigation
-from evaluation.metrics import compute_metrics
-from plots.plot_2d import plot_2d_grid
-from plots.plot_3d import plot_3d_terrain
+from environment.map_generator import generate_2d_map, get_valid_start_goal # type: ignore
+from environment.terrain_generator import generate_3d_terrain # type: ignore
+from planning.astar import astar_path # type: ignore
+from dataset.dataset_generator import generate_dataset # type: ignore
+from model.train_ann import train_and_save_model, load_model # type: ignore
+from navigation.run_navigation import run_ann_navigation # type: ignore
+from evaluation.metrics import compute_metrics # type: ignore
+from plots.plot_2d import plot_2d_grid # type: ignore
+from plots.plot_3d import plot_3d_terrain # type: ignore
 
 st.set_page_config(page_title="Energy-Aware Robot", layout="wide")
 
-from ui.session_manager import init_session
+from ui.session_manager import init_session # type: ignore
 init_session()
 
 st.title("🤖 Energy-Aware Robot Navigation System")

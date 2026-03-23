@@ -1,11 +1,11 @@
-import streamlit as st
-import sys
-import os
-import plotly.graph_objects as go
-import numpy as np
+import streamlit as st # type: ignore
+import sys # type: ignore
+import os # type: ignore
+import plotly.graph_objects as go # type: ignore
+import numpy as np # type: ignore
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from ui.session_manager import init_session
+from ui.session_manager import init_session # type: ignore
 init_session()
 
 st.set_page_config(page_title="Analytics", layout="wide")
