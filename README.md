@@ -1,81 +1,125 @@
 # 🤖 Energy-Aware Robot Navigation System
 
-Welcome to the **Energy-Aware Robot Navigation System**! This project is an advanced simulation and machine-learning framework designed to teach an Artificial Neural Network (ANN) how to autonomously navigate an environment by learning from a heuristic teacher algorithm (A*). The focus is specifically structured around "Energy-Awareness"—costing operations differently based on distances, rotations, and steep 3D terrain slopes.
+An intelligent robot navigation platform that uses **Artificial Neural Networks (ANN)** to learn energy-optimal pathfinding by imitating the **A\* search algorithm** across 2D obstacle grids and 3D terrain topographies.
 
----
+## 🎯 Project Objective
 
-## 🌟 Key Features
+> **Minimize total energy consumption** — not just path length — by training a neural network to suppress unnecessary turns and avoid steep terrain slopes.
 
-1. **Dual-Algorithm Navigation**: Compare an optimal heuristic baseline (A* Cost-Search) against an unpredictable, fast student (Multilayer Perceptron Neural Network).
-2. **Dynamic 2D/3D Environments**: 
-   - **Phase 1**: Flat 2D grid environments with configurable obstacle density.
-   - **Phase 2**: Complex 3D topographies (hills, steep cliffs) where elevation changes drastically affect the energy required to traverse.
-3. **Automated ML Dataset Generation**: Scrape thousands of perfect algorithmic path trajectories in seconds to build massive behavior-cloning datasets.
-4. **Centralized UI Dashboard**: Explore, simulate, compare, and modify simulations live through an interactive Streamlit multipage application.
-5. **Timeline Scrubbing HUD**: Easily pause, step forward, backward, and analyze sensor features during runtime using the isolated Simulation Scrubber.
+The system explicitly considers three energy cost factors:
+- **Forward Movement:** 1.0 energy unit per cell
+- **Rotation (Turn):** 5.0 energy units per 90° turn
+- **Slope Climbing:** 10.0 × height difference (slopes > 0.5 are impassable walls)
 
----
+## 🏗️ Architecture
 
-## 📂 Project Structure
+```
+energy_aware_robot/
+├── main.py                          # Entry point (launches Streamlit)
+├── config.py                        # Global constants (costs, directions)
+├── environment/
+│   ├── map_generator.py             # 2D obstacle grid generation
+│   └── terrain_generator.py         # 3D height map generation (flat/hills/steep/mixed)
+├── planning/
+│   └── astar.py                     # Energy-weighted A* search algorithm
+├── dataset/
+│   └── dataset_generator.py         # Feature extraction & labeled dataset builder
+├── model/
+│   └── train_ann.py                 # MLPClassifier training & persistence
+├── navigation/
+│   └── run_navigation.py            # ANN inference loop with heading hysteresis
+├── evaluation/
+│   └── metrics.py                   # Energy, path length & turn calculations
+├── plots/
+│   ├── plot_2d.py                   # Matplotlib 2D grid with terrain underlay
+│   └── plot_3d.py                   # Plotly 3D interactive terrain surface
+└── ui/
+    ├── app.py                       # Main Streamlit dashboard (all-in-one)
+    ├── session_manager.py           # Centralized state management
+    └── pages/
+        ├── dashboard.py             # Landing page with project overview
+        ├── map_setup.py             # Environment configuration & preview
+        ├── training.py              # Dataset generation & ANN training
+        ├── simulation.py            # Live path execution & timeline scrubber
+        ├── analytics.py             # Neural network diagnostics & heatmap
+        └── comparison.py            # A* vs ANN metrics & academic conclusion
+```
 
-- `ui/` - Contains the Streamlit frontend.
-  - `pages/` - Isolated interactive modules (`map_setup.py`, `training.py`, `simulation.py`, `comparison.py`, `dashboard.py`).
-  - `session_manager.py` - Core single source of truth for UI state.
-  - `app.py` - Primary application entry and overview file.
-- `navigation/` & `planning/` - Core A* heuristic logic and neural network agent runner blocks.
-- `dataset/` - Generator functions capable of extracting and packing feature sets (distances, raycast angles, slopes).
-- `model/` - The ANN (Multilayer Perceptron) initialization and validation code (`train_test_split`).
-- `plots/` - Matplotlib and Plotly visual rendering tools.
-- `main.py` - Easy launch wrapper.
+## 🧠 Neural Network Details
 
----
+| Property | Value |
+|---|---|
+| **Model** | Scikit-Learn `MLPClassifier` |
+| **Topology** | `(64, 64, 32)` — 3 hidden layers |
+| **Activation** | ReLU |
+| **Solver** | Adam with adaptive learning rate |
+| **Max Epochs** | 2,000 |
+| **Validation** | 15% train-test split |
+| **Heading Hysteresis** | `+0.25` probability bias toward Forward to suppress zig-zagging |
 
-## ⚡ Energy Metrics & Cost Function
+### Feature Sets
+- **Phase 1 (5 features):** Distance to Goal, Relative Angle, Obstacle Forward/Left/Right
+- **Phase 2 (8 features):** Distance, Angle, Slope Forward/Left/Right, Obstacle Forward/Left/Right
 
-The environment utilizes a highly specific cost calculation:
-- **Forward translation**: `1.0` units of energy per grid cell.
-- **Rotation (90° turn)**: `5.0` units of energy computationally (encourages straight paths).
-- **Incline Climbing**: `10.0` units per height increment over the slope terrain.
-- **Max Slope Rules**: Slopes exceeding `0.5` delta height act as absolute walls/obstacles.
+## 🏔️ Terrain Types
 
----
+| Type | Description | Elevation Range |
+|---|---|---|
+| **Flat** | Zero elevation everywhere | 0 m |
+| **Hills** | Gentle, smooth rolling slopes (σ=3.5 Gaussian blur) | 0–6 m |
+| **Steep** | Sharp, jagged spikes (σ=0.8 Gaussian blur) | 0–15 m |
+| **Mixed** | Hills base layer + steep spike overlay | 0–15 m |
 
-## 🚀 Setup & Installation
+## 🚀 Setup & Run
 
-### Requirements
-Ensure you are using **Python 3.8+**. 
-This project uses several standard visual and data science distributions (NumPy, Pandas, Scikit-Learn, Streamlit, Matplotlib, Plotly). See `requirements.txt` for exact constraints.
+### Prerequisites
+- Python 3.8+
+- pip
 
+### Installation
 ```bash
-# 1. Clone the repository and CD into it
 cd energy_aware_robot
-
-# 2. Build and activate the virtual environment
-python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On Linux/Mac:
-source venv/bin/activate
-
-# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
-### Launching the Application
-
-Start the centralized dashboard module right away through the Streamlit wrapper:
-
+### Launch
 ```bash
 python main.py
 ```
+The application opens at `http://localhost:8501`.
 
-The server will initialize on `http://localhost:8501`.
+### Workflow
+1. **Map Setup** → Configure grid size, density, terrain → Generate Map
+2. **Training** → Build dataset → Train MLP Neural Network
+3. **Simulation** → Run A* → Run ANN → Use Timeline Scrubber
+4. **Analytics** → Inspect model architecture & loss curve
+5. **Comparison** → Review energy/length/turns charts & academic conclusion
 
----
+## 📊 Key Features
 
-## 🛠️ Usage Workflow
+- **3D Interactive Terrain** — Plotly surface with white background, fixed Z-axis (0–15m), Earth colorscale, diamond Start/Goal markers
+- **2D Terrain Underlay** — Matplotlib grid overlays terrain elevation heatmap behind obstacles
+- **Toggle 3D Preview** — Checkbox to show/hide 3D terrain even for flat maps
+- **Phase Lock** — Flat terrain auto-disables Phase 2 (3D slopes are meaningless on flat)
+- **Heading Hysteresis** — ANN biases toward going straight, drastically reducing turn energy costs
+- **Academic Conclusion Panel** — Auto-generates mathematical proof explaining energy vs. distance tradeoffs
+- **Individual Comparison Charts** — Separate bar charts for Path Length, Energy, and Turns
+- **Neural Network Topology Display** — Shows Input Nodes, Hidden Layers, Output Nodes explicitly
+- **Dataset Export** — Download training data as CSV
+- **Timeline Scrubber** — Step through paths frame-by-frame with live sensor HUD
 
-1. **Map Setup:** Open the sidebar, go to Map Setup, and generate a new topographic grid and goal targets.
-2. **Model Training:** Go to the Training Center. Pick Phase 1 (2D) or Phase 2 (3D). Generate a massive internal dataset representing A* solutions, then train building the new model logic!
-3. **Simulation Engine:** Hop to Simulation, load your target map, and run the Teacher (A*) and Student (ANN) successively. Use the slider to step-by-step scrub their decision making processes.
-4. **Comparison Metrics:** Check the Head-to-Head module to mathematically contrast total energy burned, path duration, and overall efficiency between the two!
+## 📦 Dependencies
+
+```
+streamlit
+numpy
+pandas
+matplotlib
+plotly
+scikit-learn
+scipy
+```
+
+## 👥 Team
+
+Energy-Aware Robot Navigation — Academic Research Project, March 2026

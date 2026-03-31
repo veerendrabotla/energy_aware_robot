@@ -1,6 +1,6 @@
-import numpy as np
-from config import *
-from dataset.dataset_generator import extract_features
+import numpy as np # type: ignore
+from config import * # type: ignore
+from dataset.dataset_generator import extract_features # type: ignore
 
 def run_ann_navigation(grid, terrain, start, goal, model, phase=2, max_steps=500):
     cy, cx = start
@@ -24,12 +24,17 @@ def run_ann_navigation(grid, terrain, start, goal, model, phase=2, max_steps=500
             
         features = extract_features(grid, terrain, (cy, cx, hd), goal, phase=phase)
         X = np.array(features).reshape(1, -1)
-        action = model.predict(X)[0]
+        probs = model.predict_proba(X)[0]
+        
+        # Hysteresis: Heavily bias keeping straight to strictly minimize Turn Penalty energy costs!
+        HYSTERESIS_BIAS = 0.25
+        probs[FORWARD] += HYSTERESIS_BIAS
+        action = np.argmax(probs)
         
         if action == FORWARD:
             consecutive_spins = 0
             dy, dx = MOVES[hd]
-            ny, nx = cy + dy, cx + dx
+            ny, nx = cy + dy, cx + dx # type: ignore
             if not (0 <= ny < grid.shape[0] and 0 <= nx < grid.shape[1]):
                 status = "out_of_bounds"
                 break

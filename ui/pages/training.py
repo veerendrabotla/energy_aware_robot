@@ -20,8 +20,8 @@ with colA:
     st.markdown("Capture perfect heuristic data by running thousands of A* algorithms over random generations.")
     maps_to_gen = st.slider("Number of Maps", 10, 200, 50)
     scenarios = st.slider("Scenarios per Map", 5, 50, 10)
-    st.radio("Feature Set Phase", [1, 2], key="global_phase")
     phase_sel = st.session_state.global_phase
+    st.info(f"Using Phase {phase_sel} (set on Map Setup page)")
     
     if st.button("Build Dataset", width="stretch"):
         with st.spinner("Extracting features and labeling..."):

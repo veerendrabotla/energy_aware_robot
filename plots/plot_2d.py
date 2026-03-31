@@ -1,12 +1,17 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.colors import ListedColormap
+import matplotlib.pyplot as plt # type: ignore
+import numpy as np # type: ignore
+from matplotlib.colors import ListedColormap # type: ignore
 
-def plot_2d_grid(grid, start, goal, astar_path=None, ann_path=None):
+def plot_2d_grid(grid, start, goal, astar_path=None, ann_path=None, terrain=None):
     fig, ax = plt.subplots(figsize=(6, 6))
     
-    cmap = ListedColormap(['white', 'black'])
-    ax.imshow(grid, cmap=cmap, origin='upper')
+    if terrain is not None:
+        ax.imshow(terrain, cmap='terrain', alpha=0.8, origin='upper')
+        obstacle_overlay = np.ma.masked_where(grid == 0, grid)
+        ax.imshow(obstacle_overlay, cmap=ListedColormap(['black']), origin='upper', alpha=1.0)
+    else:
+        cmap = ListedColormap(['white', 'black'])
+        ax.imshow(grid, cmap=cmap, origin='upper')
     
     sy, sx = start
     gy, gx = goal

@@ -68,7 +68,7 @@ else:
             
         t1, t2 = st.tabs(["2D Overhead", "3D Topographic"])
         with t1:
-            fig2d = plot_2d_grid(st.session_state.grid, st.session_state.start, st.session_state.goal, render_a, render_n)
+            fig2d = plot_2d_grid(st.session_state.grid, st.session_state.start, st.session_state.goal, render_a, render_n, terrain=st.session_state.terrain)
             st.pyplot(fig2d)
         with t2:
             if st.session_state.terrain is not None:

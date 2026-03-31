@@ -18,6 +18,12 @@ with c1:
     model = st.session_state.get("model")
     if model:
         st.success("Model Successfully Hooked")
+        
+        colA, colB, colC = st.columns(3)
+        colA.metric("Input Nodes", model.n_features_in_)
+        colB.metric("Hidden Layers", str(model.hidden_layer_sizes))
+        colC.metric("Output Nodes", model.n_outputs_)
+        
         st.metric("Total Network Layers", model.n_layers_)
         st.metric("Convergence Epochs", model.n_iter_)
         if hasattr(model, 'loss_curve_'):

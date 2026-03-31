@@ -29,13 +29,20 @@ with col1:
     st.header("Controls")
     size = st.slider("Map Size", 10, 50, 20)
     density = st.slider("Obstacle Density", 0.0, 0.5, 0.2)
-    terrain_type = st.selectbox("Terrain Type", ["mixed", "flat", "hills", "steep"])
-    st.radio("Simulation Phase", [1, 2], key="global_phase", format_func=lambda x: "Phase 1 (2D Only)" if x == 1 else "Phase 2 (2D & 3D Slopes)")
+    terrain_type = st.selectbox("Terrain Type", ["flat", "hills", "steep", "mixed (flat, hills, steep)"])
+    st.caption("Hills possess gradual slopes, whereas steep terrain contains sharp elevation spikes.")
+    
+    if terrain_type == "flat":
+        st.session_state.global_phase = 1
+        st.radio("Simulation Phase", [1, 2], key="global_phase_fake", disabled=True, index=0, format_func=lambda x: "Phase 1 (2D Only)" if x == 1 else "Phase 2 (2D & 3D Slopes)")
+    else:
+        st.radio("Simulation Phase", [1, 2], key="global_phase", format_func=lambda x: "Phase 1 (2D Only)" if x == 1 else "Phase 2 (2D & 3D Slopes)")
+        
     phase = st.session_state.global_phase
 
-    if st.button("🗺️ Generate Map & Terrain", width="stretch"):
+    if st.button("🗺️ Generate Map (or) Terrain", width="stretch"):
         st.session_state.grid = generate_2d_map(size, density)
-        st.session_state.terrain = generate_3d_terrain(size, terrain_type) if phase == 2 else None
+        st.session_state.terrain = generate_3d_terrain(size, terrain_type)
         st.session_state.start, st.session_state.goal = get_valid_start_goal(st.session_state.grid)
         st.session_state.astar_path = None
         st.session_state.ann_path = None
@@ -86,14 +93,15 @@ with col2:
         if st.session_state.grid is not None:
             cA, cB = st.columns(2)
             with cA:
-                fig2d = plot_2d_grid(st.session_state.grid, st.session_state.start, st.session_state.goal, st.session_state.astar_path, st.session_state.ann_path)
+                fig2d = plot_2d_grid(st.session_state.grid, st.session_state.start, st.session_state.goal, st.session_state.astar_path, st.session_state.ann_path, terrain=st.session_state.terrain)
                 st.pyplot(fig2d)
             with cB:
-                if phase == 2 and st.session_state.terrain is not None:
+                show_3d = st.checkbox("Show 3D Preview", value=(phase == 2), key="app_3d_toggle")
+                if show_3d and st.session_state.terrain is not None:
                     fig3d = plot_3d_terrain(st.session_state.terrain, st.session_state.start, st.session_state.goal, st.session_state.astar_path, st.session_state.ann_path)
                     st.plotly_chart(fig3d, width="stretch")
-                else:
-                    st.info("Phase 1 Selected. 3D Terrain is disabled.")
+                elif not show_3d:
+                    st.info("Toggle the checkbox above to preview 3D terrain.")
     
     with tab2:
         if st.session_state.astar_path or st.session_state.ann_path:
